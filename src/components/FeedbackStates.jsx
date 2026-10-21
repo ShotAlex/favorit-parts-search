@@ -1,13 +1,17 @@
 import { PackageSearch, RotateCcw } from 'lucide-react';
 
 export function Loader({ label }) {
-  return <div className="inline-state"><span className="spinner" />{label}</div>;
+  return (
+    <div className="inline-state" role="status" aria-live="polite" aria-atomic="true">
+      <span className="spinner" aria-hidden="true" />{label}
+    </div>
+  );
 }
 
 export function EmptyState({ icon: Icon = PackageSearch, title, text, action }) {
   return (
-    <div className="empty-state">
-      <div className="empty-icon"><Icon size={22} /></div>
+    <div className="empty-state" role="status" aria-live="polite">
+      <div className="empty-icon" aria-hidden="true"><Icon size={22} /></div>
       <h3>{title}</h3>
       <p>{text}</p>
       {action}
@@ -17,7 +21,7 @@ export function EmptyState({ icon: Icon = PackageSearch, title, text, action }) 
 
 export function ErrorState({ text, retry }) {
   return (
-    <div className="error-state">
+    <div className="error-state" role="alert">
       <div>
         <strong>Не получилось загрузить данные</strong>
         <p>{text}</p>

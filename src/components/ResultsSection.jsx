@@ -8,7 +8,7 @@ export default function ResultsSection({ search, onSelectBrand, onRetryBrands, o
   const rows = useMemo(() => getOfferRows(search.offers), [search.offers]);
 
   return (
-    <section className="results-section" aria-live="polite">
+    <section className="results-section" aria-label="Результаты подбора">
       {!search.hasSearched ? (
         <WelcomePanel />
       ) : (

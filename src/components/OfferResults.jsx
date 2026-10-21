@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { ArrowDown, ArrowUp, SlidersHorizontal } from 'lucide-react';
 import { formatPrice, formatWarehouseCount } from '../utils/formatters';
 import { getAvailableWarehouses, getStockSummary } from '../utils/offers';
@@ -24,6 +24,7 @@ function WarehouseDetails({ warehouses }) {
 }
 
 function OfferRow({ offer, onToggle, isExpanded }) {
+  const detailsId = useId();
   const stock = getStockSummary(offer);
   const warehouses = getAvailableWarehouses(offer);
   const isRequestedPart = offer.isRequestedPart;
@@ -56,30 +57,35 @@ function OfferRow({ offer, onToggle, isExpanded }) {
           <button
             className={`row-toggle ${isExpanded ? 'expanded' : ''}`}
             onClick={onToggle}
-            aria-label={isExpanded ? 'Скрыть склады' : 'Показать склады'}
+            aria-label={`${isExpanded ? 'Скрыть' : 'Показать'} склады для ${offer.name || offer.brand || offer.number || 'детали'}`}
             aria-expanded={isExpanded}
+            aria-controls={detailsId}
           >
             {isExpanded ? <ArrowUp size={15} /> : <ArrowDown size={15} />}
           </button>
         </td>
       </tr>
-      {isExpanded && (
-        <tr className="warehouse-row">
-          <td colSpan="4"><WarehouseDetails warehouses={warehouses} /></td>
-        </tr>
-      )}
+      <tr id={detailsId} className="warehouse-row" hidden={!isExpanded}>
+        <td colSpan="4"><WarehouseDetails warehouses={warehouses} /></td>
+      </tr>
     </>
   );
 }
 
-function OffersTable({ rows }) {
+function OffersTable({ rows, selectedBrand }) {
   const [expandedId, setExpandedId] = useState(null);
 
   return (
     <div className="offers-table-wrap">
       <table className="offers-table">
+        <caption className="sr-only">Аналоги и предложения производителя {selectedBrand}</caption>
         <thead>
-          <tr><th>Деталь</th><th>Наличие</th><th>Цена от</th><th aria-label="Подробнее" /></tr>
+          <tr>
+            <th scope="col">Деталь</th>
+            <th scope="col">Наличие</th>
+            <th scope="col">Цена от</th>
+            <th scope="col">Склады</th>
+          </tr>
         </thead>
         <tbody>
           {rows.map((offer, index) => {
@@ -131,6 +137,6 @@ export default function OfferResults({ status, error, rows, selectedBrand, onRet
     );
   }
 
-  if (status === 'succeeded') return <OffersTable rows={rows} />;
+  if (status === 'succeeded') return <OffersTable rows={rows} selectedBrand={selectedBrand} />;
   return null;
 }
